@@ -43,6 +43,19 @@ ADDOBJ_EX("FIRMA", cur);
 RESULT(0)
 
 
+EQUATION("HHI") // Inverse HHI variable
+/*
+HHI = 1 / (Market_share)^2
+*/
+
+CYCLE(cur, "SECTOR")
+{ 
+	v[0] = VS(cur, "Market_share");
+	v[1] = pow(v[1], 2);
+	v[2] = 1 / v[1];
+}
+RESULT(v[2])
+
 
 
 // Exercise 3B
