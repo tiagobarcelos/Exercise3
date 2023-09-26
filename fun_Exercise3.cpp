@@ -8,6 +8,142 @@ MODELBEGIN
 
 // insert your equations here, ONLY between the MODELBEGIN and MODELEND words
 
+// Exercise 3A
+
+EQUATION("Market_share") // Market share based on competitiveness index
+
+/*
+Market_share_t = Market_share_t-1 ( 1 + mi (Compet_index_firm/Compet_index_sector - 1)) 
+*/
+
+v[0] = VL("Market_share", 1);
+v[1] = V("mi"); //  market share adjustment parameter 0 < m_s < 1
+v[2] = V("Compet_index_firm");
+v[3] = V("Compet_index_sector");
+v[4] = v[0] * ( 1 + v[1] * (v[2]/v[3] - 1));
+
+RESULT(v[4])
+
+
+EQUATION("Compet_index_firm")
+/*
+Compet_index = q_t^e / p_t^e
+*/
+
+v[0] = V("Qualityfirm");
+v[1] = V("Price");
+v[2] = V("elast_q"); // quality elasticity parameter
+v[3] = V("elast_p"); // price elasticity parameter
+v[4] = pow(v[0],v[2]);
+v[5] = pow(v[1],v[3]);
+{
+v[6]= v[4]/v[5];
+	if(v[5]=0)
+	v[6]= 0;
+	else
+	v[6]=v[6];
+}
+
+RESULT(v[6])
+
+EQUATION("Compet_index_sector")
+v[0] = 0;
+v[2] = 0;
+CYCLE(cur, "FIRMA")
+{
+	v[1] = VS(cur, "Compet_index_firm");
+	v[0] = v[0] + v[1];
+	v[2] = v[2] + 1;
+	
+}
+{
+v[3] = v[0]/v[2];
+}
+RESULT(v[3])
+
+
+EQUATION("Qualityfirm") 
+/*
+Qualityfirm_t = Qualityfirm_t-1 + c_t 
+c_t ~ U(q_min, q_max)  
+*/
+
+v[0] = VL("Qualityfirm",1);
+v[1] = V("c");
+v[2] = v[0] + v[1];
+RESULT(v[2])
+
+
+EQUATION ("c")
+v[0] = V("min");
+v[1] = V("max");
+v[2] = uniform(v[0], v[1]);
+RESULT(v[2])
+
+
+
+// Exercise 2
+EQUATION("Max_Price") // Calcular o preço máx do setor usando o cycle
+v[0]=0;
+CYCLE(cur, "FIRMA")  // o cur aqui indica que quero fazer o cycle no objeto FIRM
+{
+	v[1]=VS(cur, "Price");
+	if(v[1]>v[0])  // Garante que eu estarei selecionando sempre o maior valor.
+	v[0] = v[1];  // Sempre que o argumento do if tiverem mais de uma linha, deve-se inserir o colchetes. 
+	else
+	v[0] = v[0];
+}
+
+RESULT(v[0])
+
+
+EQUATION("Avg_Price") // Calculando o preço médio utilizando o cycle
+
+v[0] = 0;
+v[2] = 0;
+CYCLE(cur, "FIRMA")
+{
+	v[1] = VS(cur, "Price");
+	v[0] = v[0] + v[1];
+	v[2] = v[2] + 1;
+	
+}
+{
+v[3] = v[0]/v[2];
+}
+RESULT(v[3])
+
+
+// Exercício 1 - Simple Price Model in Kaleckian spirit
+
+EQUATION("Price")
+/*
+p_t = theta(Desired_price) + (1 - theta)avg_p_t-1
+
+p_t -> preço da firma no período t
+theta -> grau de monopólio
+Desired_price -> preço desejado
+avg_p_t-1 -> preço médio da firma no período anterior
+*/
+
+v[0] = V("theta");
+v[1] = V("Desired_price");
+v[2] = AVEL("Price", 1);
+v[3] = (v[0] * v[1] + (1 - v[0]) * v[2]);
+
+RESULT(v[3])
+
+EQUATION("Desired_price")
+v[0] = V("markup");
+v[1] = V("Cost");
+v[2] = (1 + v[0])*v[1];
+RESULT(v[2])
+
+EQUATION("Cost")
+v[0] = V("avg");
+v[1] = V("sd");
+v[2] = norm(v[0], v[1]);
+RESULT(v[2])
 
 
 
