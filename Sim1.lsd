@@ -222,6 +222,55 @@ MODELBEGIN
 // insert your equations here, ONLY between the MODELBEGIN and MODELEND words
 
 
+// Exercise 3C
+
+EQUATION("Exit") // Retirar a firma que tem o market-share menor que 0.01
+v[1] = COUNT("FIRMA");
+if(v[1]>1)
+{
+v[0] = V("Market_share");
+v[2] = V("mi"); // mi é o parâmetro market-share
+v[3] = v[0] < v[2];
+cur = SEARCH_CND("Market_share", v[3]);
+DELETE(cur); 
+}
+RESULT(0)
+
+EQUATION("Entry")  // Adicionando novas firmas ao objeto SECTOR
+v[1] = V("switch_entry"); // 0 = no entry, 1 = max_market-share, 2 = random_market-share
+if(v[1]==1)
+
+{
+v[0] = MAX("Market_share");
+cur = SEARCH_CND("Market_share", v[0]);
+cur2 = ADDOBJ_EX("FIRMA", cur);
+WRITES(cur2, "mi", v[0]);
+}
+
+if(v[1]==2)
+{
+cur = RNDDRAW_FAIR("FIRMA"); // Insere uma firma aleatoriamente
+ADDOBJ_EX("FIRMA", cur);
+}
+
+RESULT(0)
+
+
+EQUATION("HHI") // Inverse HHI variable
+/*
+HHI = 1 / (Market_share)^2
+*/
+
+CYCLE(cur, "SECTOR")
+{ 
+	v[0] = VS(cur, "Market_share");
+	v[1] = pow(v[1], 2);
+	v[2] = 1 / v[1];
+}
+RESULT(v[2])
+
+
+
 // Exercise 3B
 
 EQUATION("Sum_up_ms") // Somando market-share utilizando o cycle
