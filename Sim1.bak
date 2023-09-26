@@ -1,0 +1,361 @@
+	
+Label Root
+{
+	Son: SECTOR
+	Label SECTOR
+	{
+		Son: FIRMA
+		Label FIRMA
+		{
+			Var: Price
+			Var: Cost
+			Var: Qualityfirm
+			Var: Market_share
+			Var: Compet_index_firm
+			Var: c
+			Param: avg
+			Param: sd
+			Param: theta
+			Param: markup
+			Param: mi
+			Param: elast_p
+			Param: elast_q
+			Param: max
+			Param: min
+			Var: Desired_price
+
+		}
+
+		Var: Avg_Price
+		Var: Max_Price
+		Var: Compet_index_sector
+
+	}
+
+
+}
+
+
+DATA
+
+Object: Root C	1
+
+Object: SECTOR C	1
+Var: Avg_Price 0 n + n n
+Var: Max_Price 0 n + n n
+Var: Compet_index_sector 0 n + n n
+
+Object: FIRMA C	5
+Var: Price 1 s + n n	1	1	1	1	1
+Var: Cost 0 s + n n
+Var: Qualityfirm 1 s + n n	1	1	1	1	1
+Var: Market_share 1 s + n n	0.2	0.2	0.2	0.2	0.2
+Var: Compet_index_firm 0 s + n n
+Var: c 0 s + n n
+Param: avg 0 s + n n	5	5	5	5	5
+Param: sd 0 s + n n	1	1	1	1	1
+Param: theta 0 s + n n	0.5	0.5	0.5	0.5	0.5
+Param: markup 0 s + n n	0.5	0.5	0.5	0.5	0.5
+Param: mi 0 s + n n	0.1	0.1	0.1	0.1	0.1
+Param: elast_p 0 s + n n	1	1	1	1	1
+Param: elast_q 0 s + n n	1	1	1	1	1
+Param: max 0 s + n n	1	1	1	1	1
+Param: min 0 s + n n	0	0	0	0	0
+Var: Desired_price 0 s + n n
+
+SIM_NUM 1
+SEED 1
+MAX_STEP 100
+EQUATION fun_Exercise3.cpp
+MODELREPORT report_Sim1.html
+
+DESCRIPTION
+
+Object_Root
+
+END_DESCRIPTION
+
+Object_SECTOR
+
+END_DESCRIPTION
+
+Variable_Avg_Price
+
+END_DESCRIPTION
+
+Variable_Max_Price
+
+END_DESCRIPTION
+
+Variable_Compet_index_sector
+
+END_DESCRIPTION
+
+Object_FIRMA
+
+END_DESCRIPTION
+
+Variable_Price
+p_t = theta(Desired_price) + (1 - theta)avg_p_t-1
+
+p_t -> preço da firma no período t
+theta -> grau de monopólio
+Desired_price -> preço desejado
+avg_p_t-1 -> preço médio da firma no período anterior
+_INIT_
+All 5 instances equal to 1
+END_DESCRIPTION
+
+Variable_Cost
+
+END_DESCRIPTION
+
+Variable_Qualityfirm
+Qualityfirm_t = Qualityfirm_t-1 + c_t 
+c_t ~ U(q_min, q_max)
+_INIT_
+All 5 instances equal to 1
+END_DESCRIPTION
+
+Variable_Market_share
+Market_share_t = Market_share_t-1 ( 1 + mi (Compet_index_firm/Compet_index_sector - 1))
+_INIT_
+All 5 instances equal to 0.2
+END_DESCRIPTION
+
+Variable_Compet_index_firm
+Compet_index = q_t^e / p_t^e
+END_DESCRIPTION
+
+Variable_c
+
+END_DESCRIPTION
+
+Parameter_avg
+
+_INIT_
+All 5 instances equal to 5
+END_DESCRIPTION
+
+Parameter_sd
+
+_INIT_
+All 5 instances equal to 1
+END_DESCRIPTION
+
+Parameter_theta
+
+_INIT_
+All 5 instances equal to 0.5
+END_DESCRIPTION
+
+Parameter_markup
+
+_INIT_
+All 5 instances equal to 0.5
+END_DESCRIPTION
+
+Parameter_mi
+
+_INIT_
+All 5 instances equal to 0.1
+END_DESCRIPTION
+
+Parameter_elast_p
+
+_INIT_
+All 5 instances equal to 1
+END_DESCRIPTION
+
+Parameter_elast_q
+
+_INIT_
+All 5 instances equal to 1
+END_DESCRIPTION
+
+Parameter_max
+
+_INIT_
+All 5 instances equal to 1
+END_DESCRIPTION
+
+Parameter_min
+
+END_DESCRIPTION
+
+Variable_Desired_price
+
+END_DESCRIPTION
+
+
+DOCUOBSERVE
+
+END_DOCUOBSERVE
+
+
+DOCUINITIAL
+
+END_DOCUINITIAL
+
+
+EQ_FILE
+//#define EIGENLIB			// uncomment to use Eigen linear algebra library
+
+#include "fun_head_fast.h"
+
+// do not add Equations in this area
+
+MODELBEGIN
+
+// insert your equations here, ONLY between the MODELBEGIN and MODELEND words
+
+// Exercise 3A
+
+EQUATION("Market_share") // Market share based on competitiveness index
+
+/*
+Market_share_t = Market_share_t-1 ( 1 + mi (Compet_index_firm/Compet_index_sector - 1)) 
+*/
+
+v[0] = VL("Market_share", 1);
+v[1] = V("mi"); //  market share adjustment parameter 0 < m_s < 1
+v[2] = V("Compet_index_firm");
+v[3] = V("Compet_index_sector");
+v[4] = v[0] * ( 1 + v[1] * (v[2]/v[3] - 1));
+
+RESULT(v[4])
+
+
+EQUATION("Compet_index_firm")
+/*
+Compet_index = q_t^e / p_t^e
+*/
+
+v[0] = V("Qualityfirm");
+v[1] = V("Price");
+v[2] = V("elast_q"); // quality elasticity parameter
+v[3] = V("elast_p"); // price elasticity parameter
+v[4] = pow(v[0],v[2]);
+v[5] = pow(v[1],v[3]);
+{
+v[6]= v[4]/v[5];
+	if(v[5]=0)
+	v[6]= 0;
+	else
+	v[6]=v[6];
+}
+
+RESULT(v[6])
+
+EQUATION("Compet_index_sector")
+v[0] = 0;
+v[2] = 0;
+CYCLE(cur, "FIRMA")
+{
+	v[1] = VS(cur, "Compet_index_firm");
+	v[0] = v[0] + v[1];
+	v[2] = v[2] + 1;
+	
+}
+{
+v[3] = v[0]/v[2];
+}
+RESULT(v[3])
+
+
+EQUATION("Qualityfirm") 
+/*
+Qualityfirm_t = Qualityfirm_t-1 + c_t 
+c_t ~ U(q_min, q_max)  
+*/
+
+v[0] = VL("Qualityfirm",1);
+v[1] = V("c");
+v[2] = v[0] + v[1];
+RESULT(v[2])
+
+
+EQUATION ("c")
+v[0] = V("min");
+v[1] = V("max");
+v[2] = uniform(v[0], v[1]);
+RESULT(v[2])
+
+
+
+// Exercise 2
+EQUATION("Max_Price") // Calcular o preço máx do setor usando o cycle
+v[0]=0;
+CYCLE(cur, "FIRMA")  // o cur aqui indica que quero fazer o cycle no objeto FIRM
+{
+	v[1]=VS(cur, "Price");
+	if(v[1]>v[0])  // Garante que eu estarei selecionando sempre o maior valor.
+	v[0] = v[1];  // Sempre que o argumento do if tiverem mais de uma linha, deve-se inserir o colchetes. 
+	else
+	v[0] = v[0];
+}
+
+RESULT(v[0])
+
+
+EQUATION("Avg_Price") // Calculando o preço médio utilizando o cycle
+
+v[0] = 0;
+v[2] = 0;
+CYCLE(cur, "FIRMA")
+{
+	v[1] = VS(cur, "Price");
+	v[0] = v[0] + v[1];
+	v[2] = v[2] + 1;
+	
+}
+{
+v[3] = v[0]/v[2];
+}
+RESULT(v[3])
+
+
+// Exercício 1 - Simple Price Model in Kaleckian spirit
+
+EQUATION("Price")
+/*
+p_t = theta(Desired_price) + (1 - theta)avg_p_t-1
+
+p_t -> preço da firma no período t
+theta -> grau de monopólio
+Desired_price -> preço desejado
+avg_p_t-1 -> preço médio da firma no período anterior
+*/
+
+v[0] = V("theta");
+v[1] = V("Desired_price");
+v[2] = AVEL("Price", 1);
+v[3] = (v[0] * v[1] + (1 - v[0]) * v[2]);
+
+RESULT(v[3])
+
+EQUATION("Desired_price")
+v[0] = V("markup");
+v[1] = V("Cost");
+v[2] = (1 + v[0])*v[1];
+RESULT(v[2])
+
+EQUATION("Cost")
+v[0] = V("avg");
+v[1] = V("sd");
+v[2] = norm(v[0], v[1]);
+RESULT(v[2])
+
+
+
+
+MODELEND
+
+// do not add Equations in this area
+
+void close_sim( void )
+{
+	// close simulation special commands go here
+}
+
+END_EQ_FILE

@@ -10,7 +10,7 @@ Exercise_3
 595x462+741+172
 1042x591+822+323
 Sim1.lsd
-SECTOR
+FIRMA
 1
-7
+3
 0.0
