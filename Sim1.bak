@@ -49,7 +49,7 @@ Object: FIRMA C	5
 Var: Price 1 s + n n	1	1	1	1	1
 Var: Cost 0 s + n n
 Var: Qualityfirm 1 s + n n	1	1	1	1	1
-Var: Market_share 1 s + n n	0.2	0.2	0.2	0.2	0.2
+Var: Market_share 1 s + n p	0.2	0.2	0.2	0.2	0.2
 Var: Compet_index_firm 0 s + n n
 Var: c 0 s + n n
 Param: avg 0 s + n n	5	5	5	5	5
