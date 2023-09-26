@@ -21,6 +21,21 @@ CYCLE(cur, "FIRMA")
 }
 RESULT(v[2])
 
+// Normalization for consistency
+EQUATION("Sum_ms_consist")
+v[0] = 0;
+v[1] = (SUM("Market_share"));
+CYCLE(cur, "FIRMA")
+{
+	v[3]=VS(cur, "Market_share");
+	v[0] = v[0] + v[3];
+	v[4] = v[0] + 1;	
+	v[5] = v[4] / v[1];
+	WRITES(cur, "Market_share", v[5]);
+	
+}
+RESULT(v[5])
+
 
 
 // Exercise 3A
