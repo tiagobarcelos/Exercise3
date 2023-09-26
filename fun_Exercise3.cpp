@@ -8,6 +8,21 @@ MODELBEGIN
 
 // insert your equations here, ONLY between the MODELBEGIN and MODELEND words
 
+
+// Exercise 3B
+
+EQUATION("Sum_up_ms") // Somando market-share utilizando o cycle
+v[0]=0;
+CYCLE(cur, "FIRMA")  
+{
+	v[1]=VS(cur, "Market_share");
+	v[0] = v[0] + v[1];
+	v[2] = v[0] + 1;
+}
+RESULT(v[2])
+
+
+
 // Exercise 3A
 
 EQUATION("Market_share") // Market share based on competitiveness index
