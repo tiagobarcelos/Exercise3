@@ -23,6 +23,25 @@ DELETE(cur);
 }
 RESULT(0)
 
+EQUATION("Entry")  // Adicionando novas firmas ao objeto SECTOR
+v[1] = V("switch_entry"); // 0 = no entry, 1 = max_market-share, 2 = random_market-share
+if(v[1]==1)
+
+{
+v[0] = MAX("Market_share");
+cur = SEARCH_CND("Market_share", v[0]);
+cur2 = ADDOBJ_EX("FIRMA", cur);
+WRITES(cur2, "mi", v[0]);
+}
+
+if(v[1]==2)
+{
+cur = RNDDRAW_FAIR("FIRMA"); // Insere uma firma aleatoriamente
+ADDOBJ_EX("FIRMA", cur);
+}
+
+RESULT(0)
+
 
 
 
