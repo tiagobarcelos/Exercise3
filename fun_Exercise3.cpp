@@ -9,6 +9,23 @@ MODELBEGIN
 // insert your equations here, ONLY between the MODELBEGIN and MODELEND words
 
 
+// Exercise 3C
+
+EQUATION("Exit") // Retirar a firma que tem o market-share menor que 0.01
+v[1] = COUNT("FIRMA");
+if(v[1]>1)
+{
+v[0] = V("Market_share");
+v[2] = V("mi"); // mi é o parâmetro market-share
+v[3] = v[0] < v[2];
+cur = SEARCH_CND("Market_share", v[3]);
+DELETE(cur); 
+}
+RESULT(0)
+
+
+
+
 // Exercise 3B
 
 EQUATION("Sum_up_ms") // Somando market-share utilizando o cycle
