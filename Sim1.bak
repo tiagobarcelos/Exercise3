@@ -29,6 +29,7 @@ Label Root
 		Var: Avg_Price
 		Var: Max_Price
 		Var: Compet_index_sector
+		Var: Sum_up_ms
 
 	}
 
@@ -41,9 +42,10 @@ DATA
 Object: Root C	1
 
 Object: SECTOR C	1
-Var: Avg_Price 0 n + n n
-Var: Max_Price 0 n + n n
-Var: Compet_index_sector 0 n + n n
+Var: Avg_Price 0 s + n n
+Var: Max_Price 0 s + n n
+Var: Compet_index_sector 0 s + n n
+Var: Sum_up_ms 0 s + n p
 
 Object: FIRMA C	5
 Var: Price 1 s + n n	1	1	1	1	1
@@ -88,6 +90,10 @@ Variable_Max_Price
 END_DESCRIPTION
 
 Variable_Compet_index_sector
+
+END_DESCRIPTION
+
+Variable_Sum_up_ms
 
 END_DESCRIPTION
 
@@ -208,6 +214,21 @@ EQ_FILE
 MODELBEGIN
 
 // insert your equations here, ONLY between the MODELBEGIN and MODELEND words
+
+
+// Exercise 3B
+
+EQUATION("Sum_up_ms") // Somando market-share utilizando o cycle
+v[0]=0;
+CYCLE(cur, "FIRMA")  
+{
+	v[1]=VS(cur, "Market_share");
+	v[0] = v[0] + v[1];
+	v[2] = v[0] + 1;
+}
+RESULT(v[2])
+
+
 
 // Exercise 3A
 

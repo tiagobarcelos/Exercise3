@@ -1,3 +1,3 @@
-Avg_Price c Compet_index_firm Compet_index_sector Cost Desired_price Market_share Max_Price Price Qualityfirm Sum_up_ms
+Avg_Price c Compet_index_firm Compet_index_sector Cost Desired_price Market_share Max_Price Price Qualityfirm Sum_ms_consist Sum_up_ms
 avg elast_p elast_q markup max mi min sd theta
 FIRMA
